@@ -1,6 +1,6 @@
 # Launches GUI
 
-from tkinter import *
+import tkinter as tk
 from tkinter import filedialog as fd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -26,20 +26,23 @@ class MainApplication:
 
         # Create widgets
         # Label: select import directory
-        sel_import_dir_lbl = Label(root, text="Select the directory containing scans:")
-        sel_import_dir_lbl.grid(row=0, column=0, sticky=W, padx=5, pady=5)
+        sel_import_dir_lbl = tk.Label(
+            root, text="Select the directory containing scans:")
+        sel_import_dir_lbl.grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
 
         # Button: browse import directories
-        sel_import_dir_btn = Button(root, text="Open", width=5, command=self.open_import_dir)
-        sel_import_dir_btn.grid(row=0, column=1, sticky=W, padx=5, pady=5)
+        sel_import_dir_btn = tk.Button(
+            root, text="Open", width=5, command=self.open_import_dir)
+        sel_import_dir_btn.grid(row=0, column=1, sticky=tk.W, padx=5, pady=5)
 
         # Label: selected import directory
-        self.selected_import_dir_lbl = Label(root, text='')
-        self.selected_import_dir_lbl.grid(row=1, column=0, columnspan=2, sticky=W,
+        self.selected_import_dir_lbl = tk.Label(root, text='')
+        self.selected_import_dir_lbl.grid(row=1, column=0, columnspan=2, sticky=tk.W,
                                           padx=5, pady=5)
 
         # Button: plot button
-        self.plot_btn = Button(self.root, text="Plot", width=5, command=self.plot)
+        self.plot_btn = tk.Button(
+            self.root, text="Plot", width=5, command=self.plot)
 
         # Canvas: blank canvas
         self.figure = Figure()
@@ -48,23 +51,39 @@ class MainApplication:
         self.canvas.draw()
 
         # Label: select export directory
-        self.sel_export_dir_lbl = Label(root, text='')
+        self.sel_export_dir_lbl = tk.Label(root, text='')
 
         # Button: browse export directories
-        self.sel_export_dir_btn = Button(root, text="Open", width=5, command=self.open_export_dir)
+        self.sel_export_dir_btn = tk.Button(
+            root, text="Open", width=5, command=self.open_export_dir)
 
         # Label: selected export directory
-        self.selected_export_dir_lbl = Label(root, text='')
-        self.selected_export_dir_lbl.grid(row=5, column=0, columnspan=2, sticky=W,
+        self.selected_export_dir_lbl = tk.Label(root, text='')
+        self.selected_export_dir_lbl.grid(row=5, column=0, columnspan=2, sticky=tk.W,
                                           padx=5, pady=5)
 
         # Button: export button
-        self.export_btn = Button(self.root, text="Export", width=5,
-                                         command=self.export)
+        self.export_btn = tk.Button(self.root, text="Export", width=5,
+                                    command=self.export)
 
         # Label: data exported successfully
-        self.exported_lbl = Label(root, text='')
-        self.exported_lbl.grid(row=6, column=0, columnspan=2, sticky=W, padx=5, pady=5)
+        self.exported_lbl = tk.Label(root, text='')
+        self.exported_lbl.grid(
+            row=6, column=0, columnspan=2, sticky=tk.W, padx=5, pady=5)
+
+    def create_widgets(self):
+        """Create and place all widgets"""
+        pass
+
+    def create_label(self, text, row, col, colspan=1):
+        label = tk.Label(self.root, text=text)
+        label.grid(row=row, column=col, columnspan=colspan, sticky=tk.W, padx=5, pady=5)
+        return label
+
+    def create_button(self, text, row, col, command):
+        button = tk.Button(self.root, text=text, command=command)
+        button.grid(row=row, column=col, sticky=tk.W, padx=5, pady=5)
+        return button
 
     def open_import_dir(self):
         # Open a directory selection dialog
@@ -91,7 +110,7 @@ class MainApplication:
         if not any(f.is_file() and (f.suffix.lower() == '.ima' or f.suffix.lower() == '.dcm')
                    for f in path.iterdir()):
             self.selected_import_dir_lbl.config(text="Selected directory doesn't "
-                                              "contain .ima or .dcm files")
+                                                "contain .ima or .dcm files")
             self.plot_btn.grid_forget()
             return
 
@@ -100,7 +119,7 @@ class MainApplication:
             text=f"You selected: {self.import_dir}")
 
         # Present plot button
-        self.plot_btn.grid(row=1, column=1, sticky=W, padx=5, pady=5)
+        self.plot_btn.grid(row=1, column=1, sticky=tk.W, padx=5, pady=5)
 
     def plot(self):
         # Retrieve plot and associated data
@@ -113,11 +132,14 @@ class MainApplication:
         self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
         # Label: select export directory
-        self.sel_export_dir_lbl = Label(root, text="Select directory to export data to:")
-        self.sel_export_dir_lbl.grid(row=3, column=0, sticky=W, padx=5, pady=5)
+        self.sel_export_dir_lbl = tk.Label(
+            root, text="Select directory to export data to:")
+        self.sel_export_dir_lbl.grid(
+            row=3, column=0, sticky=tk.W, padx=5, pady=5)
 
         # Button: browse export directories
-        self.sel_export_dir_btn.grid(row=3, column=1, sticky=W, padx=5, pady=5)
+        self.sel_export_dir_btn.grid(
+            row=3, column=1, sticky=tk.W, padx=5, pady=5)
 
     def open_export_dir(self):
         # Open a directory selection dialog
@@ -138,8 +160,7 @@ class MainApplication:
             text=f"You selected: {self.export_dir}")
 
         # Present export button
-        self.export_btn.grid(row=5, column=1, sticky=W, padx=5, pady=5)
-
+        self.export_btn.grid(row=5, column=1, sticky=tk.W, padx=5, pady=5)
 
     def export(self):
         main_export(self.df, self.figure, self.title, self.export_dir)
@@ -149,7 +170,7 @@ class MainApplication:
 # Main Execution Block
 if __name__ == '__main__':
     # Create root window
-    root = Tk()
+    root = tk.Tk()
 
     # Create and run the application
     MainApplication(root)
