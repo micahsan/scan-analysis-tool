@@ -19,12 +19,26 @@ class MainApplication:
         self.root = root
         self.root.title(WINDOW_TITLE)
         self.root.geometry(WINDOW_SIZE)
+
         self.df = None
         self.title = None
         self.import_dir = None
         self.export_dir = None
+        self.selected_import_dir_lbl = None
+        self.plot_btn = None
+        self.figure = None
+        self.canvas = None
+        self.sel_export_dir_lbl = None
+        self.sel_export_dir_btn = None
+        self.selected_export_dir_lbl = None
+        self.export_btn = None
+        self.exported_lbl = None
 
         # Create widgets
+        self.create_widgets()
+
+    def create_widgets(self):
+        """Create and place all widgets"""
         # Label: select import directory
         sel_import_dir_lbl = tk.Label(
             root, text="Select the directory containing scans:")
@@ -37,7 +51,8 @@ class MainApplication:
 
         # Label: selected import directory
         self.selected_import_dir_lbl = tk.Label(root, text='')
-        self.selected_import_dir_lbl.grid(row=1, column=0, columnspan=2, sticky=tk.W,
+        self.selected_import_dir_lbl.grid(row=1, column=0, columnspan=2,
+                                          sticky=tk.W,
                                           padx=5, pady=5)
 
         # Button: plot button
@@ -47,7 +62,8 @@ class MainApplication:
         # Canvas: blank canvas
         self.figure = Figure()
         self.canvas = FigureCanvasTkAgg(self.figure, self.root)
-        self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=1, padx=5, pady=5)
+        self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=1, padx=5,
+                                         pady=5)
         self.canvas.draw()
 
         # Label: select export directory
@@ -59,7 +75,8 @@ class MainApplication:
 
         # Label: selected export directory
         self.selected_export_dir_lbl = tk.Label(root, text='')
-        self.selected_export_dir_lbl.grid(row=5, column=0, columnspan=2, sticky=tk.W,
+        self.selected_export_dir_lbl.grid(row=5, column=0, columnspan=2,
+                                          sticky=tk.W,
                                           padx=5, pady=5)
 
         # Button: export button
@@ -70,10 +87,6 @@ class MainApplication:
         self.exported_lbl = tk.Label(root, text='')
         self.exported_lbl.grid(
             row=6, column=0, columnspan=2, sticky=tk.W, padx=5, pady=5)
-
-    def create_widgets(self):
-        """Create and place all widgets"""
-        pass
 
     def create_label(self, text, row, col, colspan=1):
         label = tk.Label(self.root, text=text)
