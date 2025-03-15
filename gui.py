@@ -74,10 +74,26 @@ class MainApplication:
         return button
 
     def open_import_dir(self):
-        # Open a directory selection dialog
         self.import_dir = fd.askdirectory(initialdir="/", title="Select file")
 
-        # Clear selected directories label and canvas
+        self.clear_widgets()
+
+        if not self.import_dir:
+            self.selected_import_dir_lbl.config(text="No directory selected")
+            return
+
+        valid_extensions = {'.ima', '.dcm'}
+        path = Path(self.import_dir)
+        if not any(f.is_file() and (f.suffix.lower() in valid_extensions) for f in path.iterdir()):
+            self.selected_import_dir_lbl.config(text="Selected directory doesn't "
+                                                "contain .ima or .dcm files")
+            self.plot_btn.grid_remove()
+            return
+
+        self.selected_import_dir_lbl.config(text=f"You selected: {self.import_dir}")
+        self.plot_btn.grid()
+
+    def clear_widgets(self):
         self.selected_import_dir_lbl.config(text='')
         self.canvas.figure.clear()
         self.sel_export_dir_lbl.grid_remove()
@@ -86,27 +102,6 @@ class MainApplication:
         self.selected_export_dir_lbl.grid_remove()
         self.export_btn.grid_remove()
         self.exported_lbl.grid_remove()
-
-        # Check if the directory was selected
-        if not self.import_dir:
-            self.selected_import_dir_lbl.config(text="No directory selected")
-            return
-
-        # Check that directory contains .ima or .dcm files
-        path = Path(self.import_dir)
-        if not any(f.is_file() and (f.suffix.lower() == '.ima' or f.suffix.lower() == '.dcm')
-                   for f in path.iterdir()):
-            self.selected_import_dir_lbl.config(text="Selected directory doesn't "
-                                                "contain .ima or .dcm files")
-            self.plot_btn.grid_remove()
-            return
-
-        # Display selected directory
-        self.selected_import_dir_lbl.config(
-            text=f"You selected: {self.import_dir}")
-
-        # Present plot button
-        self.plot_btn.grid()
 
     def plot(self):
         self.df, self.figure, self.title = main_plot(self.import_dir)
