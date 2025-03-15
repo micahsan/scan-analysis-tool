@@ -15,11 +15,11 @@ WINDOW_SIZE = '1000x800'
 # Main GUI Class
 class MainApplication:
     def __init__(self, root):
-        # Store the root window
         self.root = root
         self.root.title(WINDOW_TITLE)
         self.root.geometry(WINDOW_SIZE)
 
+        # TODO: this is ugly
         self.df = None
         self.title = None
         self.import_dir = None
@@ -35,7 +35,6 @@ class MainApplication:
         self.export_btn = None
         self.exported_lbl = None
 
-        # Create widgets
         self.create_widgets()
 
     def create_widgets(self):
@@ -80,8 +79,7 @@ class MainApplication:
 
         # Clear selected directories label and canvas
         self.selected_import_dir_lbl.config(text='')
-        self.figure.clear()
-        self.canvas.draw()
+        self.canvas.figure.clear()
         self.sel_export_dir_lbl.grid_remove()
         self.sel_export_dir_btn.grid_remove()
         self.plot_btn.grid_remove()
@@ -111,19 +109,13 @@ class MainApplication:
         self.plot_btn.grid()
 
     def plot(self):
-        # Retrieve plot and associated data
         self.df, self.figure, self.title = main_plot(self.import_dir)
 
-        # Create tkinter canvas with the figure
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
+        self.canvas.figure.clear()
+        self.canvas.figure = self.figure
+        self.canvas.draw()
 
-        # Place the canvas on the window
-        self.canvas.get_tk_widget().grid(row=2, column=0, columnspan=2, padx=5, pady=5)
-
-        # Label: select export directory
         self.sel_export_dir_lbl.grid()
-
-        # Button: browse export directories
         self.sel_export_dir_btn.grid()
 
     def open_export_dir(self):
