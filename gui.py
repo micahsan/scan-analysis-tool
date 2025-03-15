@@ -67,7 +67,7 @@ class MainApplication:
         return label
 
     def create_button(self, text, row, col, command, hidden=False):
-        button = tk.Button(self.root, text=text, command=command)
+        button = tk.Button(self.root, text=text, width=5, command=command)
         button.grid(row=row, column=col, sticky=tk.W, padx=5, pady=5)
         if hidden:
             button.grid_remove()
@@ -99,7 +99,7 @@ class MainApplication:
         self.sel_export_dir_lbl.grid_remove()
         self.sel_export_dir_btn.grid_remove()
         self.plot_btn.grid_remove()
-        self.selected_export_dir_lbl.grid_remove()
+        self.selected_export_dir_lbl.config(text='')
         self.export_btn.grid_remove()
         self.exported_lbl.grid_remove()
 
@@ -114,25 +114,16 @@ class MainApplication:
         self.sel_export_dir_btn.grid()
 
     def open_export_dir(self):
-        # Open a directory selection dialog
         self.export_dir = fd.askdirectory(initialdir="/", title="Select file")
 
-        # Clear selected directory label
+        self.export_btn.grid_remove()
         self.exported_lbl.grid_remove()
 
-        # Check if the directory was selected
         if not self.export_dir:
             self.selected_export_dir_lbl.config(text="No directory selected")
-            self.selected_export_dir_lbl.grid()
-            self.export_btn.grid_remove()
             return
 
-        # Display selected directory
-        self.selected_export_dir_lbl.config(
-            text=f"You selected: {self.export_dir}")
-        self.selected_export_dir_lbl.grid()
-
-        # Present export button
+        self.selected_export_dir_lbl.config(text=f"You selected: {self.export_dir}")
         self.export_btn.grid()
 
     def export(self):
