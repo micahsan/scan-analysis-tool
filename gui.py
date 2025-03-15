@@ -44,37 +44,34 @@ class MainApplication:
         sel_import_dir_btn = self.create_button("Open", 0, 1, self.open_import_dir)
         self.selected_import_dir_lbl = self.create_label("", 1, 0, 2)
 
-        self.plot_btn = self.create_button("Plot", 1, 1, self.plot)
-        self.plot_btn.grid_remove()     # initially hidden
+        self.plot_btn = self.create_button("Plot", 1, 1, self.plot, hidden=True)
 
         self.figure = Figure()
         self.canvas = FigureCanvasTkAgg(self.figure, self.root)
         self.canvas_widget = self.canvas.get_tk_widget()
         self.canvas_widget.grid(row=2, column=0, columnspan=1, padx=5, pady=5)
 
-        self.sel_export_dir_lbl = self.create_label("Select directory to export data to:", 3, 0)
-        self.sel_export_dir_lbl.grid_remove()     # initially hidden
-        self.sel_export_dir_btn = self.create_button("Open", 3, 1, self.open_export_dir)
-        self.sel_export_dir_btn.grid_remove()
+        self.sel_export_dir_lbl = self.create_label("Select directory to export data to:", 3, 0, hidden=True)
+        self.sel_export_dir_btn = self.create_button("Open", 3, 1, self.open_export_dir, hidden=True)
 
         self.selected_export_dir_lbl = self.create_label("", 4, 0, 2)
 
-        self.export_btn = self.create_button("Export", 4, 1, self.export)
-        self.export_btn.grid_remove()
+        self.export_btn = self.create_button("Export", 4, 1, self.export, hidden=True)
 
-        self.exported_lbl = self.create_label("Files exported successfully", 5, 0)
-        self.exported_lbl.grid_remove()
+        self.exported_lbl = self.create_label("Files exported successfully", 5, 0, hidden=True)
 
-    def create_label(self, text, row, col, colspan=1):
-        # TODO: add boolean parameter for initially hidden (use grid_remove())
+    def create_label(self, text, row, col, colspan=1, hidden=False):
         label = tk.Label(self.root, text=text)
         label.grid(row=row, column=col, columnspan=colspan, sticky=tk.W, padx=5, pady=5)
+        if hidden:
+            label.grid_remove()
         return label
 
-    def create_button(self, text, row, col, command):
-        # TODO: add boolean parameter for initially hidden (use grid_remove())
+    def create_button(self, text, row, col, command, hidden=False):
         button = tk.Button(self.root, text=text, command=command)
         button.grid(row=row, column=col, sticky=tk.W, padx=5, pady=5)
+        if hidden:
+            button.grid_remove()
         return button
 
     def open_import_dir(self):
