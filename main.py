@@ -1,7 +1,8 @@
 # Main script for controlling process
 
-from dicom_utils import *
-from output_utils import *
+from dicom_processor import *
+from export_manager import *
+from image_analyzer import *
 
 
 def main(in_directory, out_directory):

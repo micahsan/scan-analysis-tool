@@ -16,6 +16,11 @@ env/
 *.venv/
 *.env/
 
+# PyInstaller app
+build/
+dist/
+gui.spec
+
 # Misc
 *.log
 *.bak
