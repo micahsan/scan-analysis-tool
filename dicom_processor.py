@@ -1,31 +1,35 @@
-# Utilities for dicom processing
-
 from pathlib import Path
 from pydicom import dcmread
+from pydicom.errors import InvalidDicomError
+
+SERIES_DESCRIPTION = 'PET AC'
+VALID_EXTENSIONS = {'.ima', '.dcm'}
 
 
-def load_dicom_files(folder_path):
-    """Loads all DICOM files in the given directory"""
-    # TODO: add check that folder isn't empty, return something else if unsuccessful
-    dicom_files = []
+class DICOMProcessor:
+    def __init__(self, folder_path):
+        self.path = Path(folder_path)
+        self.folder_name = str(self.path.parts[-1])
+        self.dicom_files = []
+        self.image_series = []
 
-    # Convert the folder path to a Path object
-    path = Path(folder_path)
+    def load_dicom_files(self):
+        """Loads all DICOM files in the given folder"""
+        self.dicom_files = [f for f in self.path.iterdir() if f.is_file()
+                            and f.suffix.lower() in VALID_EXTENSIONS]
+        return len(self.dicom_files) > 0
 
-    # Check that given path is valid
-    if not path.is_dir():
-        print('Input folder does not exist')
-        return dicom_files
+    def extract_images(self):
+        """Gets list of FileDatasets"""
+        try:
+            self.image_series = [dcmread(str(f)) for f in self.dicom_files]
+        except InvalidDicomError or TypeError:
+            return False
+        return len(self.image_series) > 0
 
-    # Loop through the files in the directory
-    for file in path.iterdir():
-        # Check if it's both a file (not a subdirectory) and .IMA
-        if file.is_file() and file.suffix == '.IMA':
-            dicom_files.append(dcmread(str(file)))
-
-    return dicom_files, str(path.parts[-1])
-
-
-def filter_dicom_files(dicom_files):
-    """Returns DICOM files with 'PET AC' as series description (0008,103E)"""
-    return [file for file in dicom_files if file.SeriesDescription == 'PET AC']
+    def filter_images(self):
+        """Filters for 'PET AC' as series description (0008,103E) and sorts"""
+        self.image_series = [f for f in self.image_series if
+                             f.SeriesDescription == SERIES_DESCRIPTION]
+        self.image_series.sort(key=lambda x: x.SliceLocation)
+        return len(self.image_series) > 0
