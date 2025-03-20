@@ -29,7 +29,7 @@ class DICOMProcessor:
 
     def filter_images(self):
         """Filters for 'PET AC' as series description (0008,103E) and sorts"""
-        self.image_series = [f for f in self.image_series if
-                             f.SeriesDescription == SERIES_DESCRIPTION]
-        self.image_series.sort(key=lambda x: x.SliceLocation)
+        self.image_series = [ds for ds in self.image_series if
+                             ds.SeriesDescription == SERIES_DESCRIPTION]
+        self.image_series.sort(key=lambda ds: ds.SliceLocation)
         return len(self.image_series) > 0
