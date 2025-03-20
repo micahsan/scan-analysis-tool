@@ -10,4 +10,4 @@ class ExportManager:
         df.to_csv(f'{str(self.path)}/{self.file_name}_counts.csv', index=False)
 
     def save_plot(self, plt):
-        plt.savefig(f'{str(self.path)}/{self.file_name}_counts.png')
+        plt.savefig(f'{str(self.path)}/{self.file_name}_counts.png', dpi=300)
