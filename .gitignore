@@ -19,7 +19,7 @@ env/
 # PyInstaller app
 build/
 dist/
-gui.spec
+main.spec
 
 # Misc
 *.log
