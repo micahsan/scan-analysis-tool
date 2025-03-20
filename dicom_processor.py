@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from pydicom import dcmread
 from pydicom.errors import InvalidDicomError
 
