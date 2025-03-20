@@ -23,10 +23,10 @@ class ImageAnalyzer:
         return self.df
 
     def generate_plot(self):
-        """Generates and returns a plot of the analysis"""
-        plt.rcParams['figure.dpi'] = 800
-        self.df.plot(x=X_LABEL, y=Y_LABEL, legend=False)
-        plt.xlabel(X_LABEL)
-        plt.ylabel(Y_LABEL)
-        plt.title(self.folder_name)
-        return plt
+        """Generates and returns a MatplotLib Figure object"""
+        fig, ax = plt.subplots()
+        ax.plot(self.df[X_LABEL], self.df[Y_LABEL])
+        ax.set_xlabel(X_LABEL)
+        ax.set_ylabel(Y_LABEL)
+        ax.set_title(self.folder_name)
+        return fig
