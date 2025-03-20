@@ -1,143 +1,96 @@
-# Launches GUI
-
 import tkinter as tk
 from tkinter import filedialog as fd
+from tkinter import messagebox as mb
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 
-from main import *
+from dicom_processor import DICOMProcessor
+from image_analyzer import ImageAnalyzer
+from export_manager import ExportManager
 
-# Configuration Constants
 WINDOW_TITLE = 'Scan Analysis Tool'
-WINDOW_SIZE = '1000x800'
+WINDOW_SIZE = '700x700'
 
 
-# Main GUI Class
-class MainApplication:
+class GUI:
     def __init__(self, root):
         self.root = root
         self.root.title(WINDOW_TITLE)
         self.root.geometry(WINDOW_SIZE)
-
-        # TODO: this is ugly
-        self.df = None
-        self.title = None
-        self.import_dir = None
-        self.export_dir = None
-        self.selected_import_dir_lbl = None
-        self.canvas_widget = None
-        self.plot_btn = None
-        self.figure = None
+        self.root.resizable(False, False)
+        self.folder_path = ''
+        self.folder_name = ''
+        self.image_series = []
+        self.dataframe = None
+        self.processor = None
+        self.analyzer = None
+        self.exporter = None
+        self.btn_2 = None
+        self.btn_3 = None
         self.canvas = None
-        self.sel_export_dir_lbl = None
-        self.sel_export_dir_btn = None
-        self.selected_export_dir_lbl = None
-        self.export_btn = None
-        self.exported_lbl = None
+        self.setup_ui()
 
-        self.create_widgets()
+    def setup_ui(self):
+        tk.Button(self.root, width=15, text="Select DICOM Folder",
+                  command=self.load_dicom_files).pack(pady=5)
+        self.btn_2 = tk.Button(self.root, width=15, text="Run Analysis",
+                               command=self.analyze_images)
+        self.btn_3 = tk.Button(self.root, width=15, text="Export Results",
+                               command=self.export_results)
 
-    def create_widgets(self):
-        """Create and place all widgets"""
-        sel_import_dir_lbl = self.create_label("Select Import Directory", 0, 0)
-        sel_import_dir_btn = self.create_button("Open", 0, 1, self.open_import_dir)
-        self.selected_import_dir_lbl = self.create_label("", 1, 0, 2)
+    def clear_ui(self):
+        if self.canvas:
+            self.canvas.get_tk_widget().destroy()
+        self.btn_2.pack_forget()
+        self.btn_3.pack_forget()
 
-        self.plot_btn = self.create_button("Plot", 1, 1, self.plot, hidden=True)
+    def load_dicom_files(self):
+        """Prompts user for folder and loads DICOM files"""
+        self.clear_ui()
 
-        self.figure = Figure()
-        self.canvas = FigureCanvasTkAgg(self.figure, self.root)
-        self.canvas_widget = self.canvas.get_tk_widget()
-        self.canvas_widget.grid(row=2, column=0, columnspan=1, padx=5, pady=5)
-
-        self.sel_export_dir_lbl = self.create_label("Select directory to export data to:", 3, 0, hidden=True)
-        self.sel_export_dir_btn = self.create_button("Open", 3, 1, self.open_export_dir, hidden=True)
-
-        self.selected_export_dir_lbl = self.create_label("", 4, 0, 2)
-
-        self.export_btn = self.create_button("Export", 4, 1, self.export, hidden=True)
-
-        self.exported_lbl = self.create_label("Files exported successfully", 5, 0, hidden=True)
-
-    def create_label(self, text, row, col, colspan=1, hidden=False):
-        label = tk.Label(self.root, text=text)
-        label.grid(row=row, column=col, columnspan=colspan, sticky=tk.W, padx=5, pady=5)
-        if hidden:
-            label.grid_remove()
-        return label
-
-    def create_button(self, text, row, col, command, hidden=False):
-        button = tk.Button(self.root, text=text, width=5, command=command)
-        button.grid(row=row, column=col, sticky=tk.W, padx=5, pady=5)
-        if hidden:
-            button.grid_remove()
-        return button
-
-    def open_import_dir(self):
-        self.import_dir = fd.askdirectory(initialdir="/", title="Select file")
-
-        self.clear_widgets()
-
-        if not self.import_dir:
-            self.selected_import_dir_lbl.config(text="No directory selected")
+        self.folder_path = fd.askdirectory()
+        if not self.folder_path:
+            mb.showerror('Error', "Please select a folder")
             return
 
-        valid_extensions = {'.ima', '.dcm'}
-        path = Path(self.import_dir)
-        if not any(f.is_file() and (f.suffix.lower() in valid_extensions) for f in path.iterdir()):
-            self.selected_import_dir_lbl.config(text="Selected directory doesn't "
-                                                "contain .ima or .dcm files")
-            self.plot_btn.grid_remove()
+        self.processor = DICOMProcessor(self.folder_path)
+        if not self.processor.load_dicom_files():
+            mb.showerror('Error', "No DICOM files found in the selected "
+                                  "folder")
             return
 
-        self.selected_import_dir_lbl.config(text=f"You selected: {self.import_dir}")
-        self.plot_btn.grid()
+        if not self.processor.extract_images():
+            mb.showerror('Error', "Error reading DICOM files")
+            return
 
-    def clear_widgets(self):
-        self.selected_import_dir_lbl.config(text='')
-        self.canvas.figure.clear()
-        self.sel_export_dir_lbl.grid_remove()
-        self.sel_export_dir_btn.grid_remove()
-        self.plot_btn.grid_remove()
-        self.selected_export_dir_lbl.config(text='')
-        self.export_btn.grid_remove()
-        self.exported_lbl.grid_remove()
+        if not self.processor.filter_images():
+            mb.showerror('Error', "No \'PET AC\' files "
+                                  "found in the selected folder")
+            return
 
-    def plot(self):
-        self.df, self.figure, self.title = main_plot(self.import_dir)
+        self.folder_name = self.processor.folder_name
+        self.image_series = self.processor.image_series
+        mb.showinfo('Success', "DICOM files loaded")
+        self.btn_2.pack(pady=5)
 
-        self.canvas.figure.clear()
-        self.canvas.figure = self.figure
+    def analyze_images(self):
+        """Performs analysis on image series and displays results"""
+        self.analyzer = ImageAnalyzer(self.image_series, self.folder_name)
+        self.dataframe = self.analyzer.compute_counts()
+        fig = self.analyzer.generate_plot()
+        self.canvas = FigureCanvasTkAgg(fig, self.root)
         self.canvas.draw()
+        self.canvas.get_tk_widget().pack(padx=30, pady=10)
+        self.btn_3.pack(pady=5)
 
-        self.sel_export_dir_lbl.grid()
-        self.sel_export_dir_btn.grid()
-
-    def open_export_dir(self):
-        self.export_dir = fd.askdirectory(initialdir="/", title="Select file")
-
-        self.export_btn.grid_remove()
-        self.exported_lbl.grid_remove()
-
-        if not self.export_dir:
-            self.selected_export_dir_lbl.config(text="No directory selected")
+    def export_results(self):
+        """Exports .PNG of plot and .CSV of DataFrame"""
+        export_path = fd.askdirectory()
+        if not export_path:
+            mb.showerror('Error', "Please select a folder")
             return
-
-        self.selected_export_dir_lbl.config(text=f"You selected: {self.export_dir}")
-        self.export_btn.grid()
-
-    def export(self):
-        main_export(self.df, self.figure, self.title, self.export_dir)
-        self.exported_lbl.grid()
-
-
-# Main Execution Block
-if __name__ == '__main__':
-    # Create root window
-    root = tk.Tk()
-
-    # Create and run the application
-    MainApplication(root)
-
-    # Start main event loop
-    root.mainloop()
+        self.exporter = ExportManager(export_path, self.folder_name)
+        self.exporter.save_csv(self.dataframe)
+        self.exporter.save_plot(self.analyzer.generate_plot())
+        mb.showinfo('Success', "Results exported")
+        self.clear_ui()
