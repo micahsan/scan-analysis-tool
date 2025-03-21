@@ -70,7 +70,6 @@ class GUI:
 
         self.folder_name = self.processor.folder_name
         self.image_series = self.processor.image_series
-        mb.showinfo('Success', "DICOM files loaded")
         self.btn_2.pack(pady=5)
 
     def analyze_images(self):
