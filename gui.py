@@ -75,7 +75,7 @@ class GUI:
     def analyze_images(self):
         """Performs analysis on image series and displays results"""
         self.analyzer = ImageAnalyzer(self.dataset_series, self.folder_name)
-        self.dataframe = self.analyzer.compute_counts()
+        self.dataframe = self.analyzer.df
         fig = self.analyzer.generate_plot()
         self.canvas = FigureCanvasTkAgg(fig, self.root)
         self.canvas.draw()
