@@ -20,7 +20,7 @@ class GUI:
         self.root.resizable(False, False)
         self.folder_path = ''
         self.folder_name = ''
-        self.image_series = []
+        self.dataset_series = []
         self.dataframe = None
         self.processor = None
         self.analyzer = None
@@ -69,12 +69,12 @@ class GUI:
             return
 
         self.folder_name = self.processor.folder_name
-        self.image_series = self.processor.image_series
+        self.dataset_series = self.processor.dataset_series
         self.btn_2.pack(pady=5)
 
     def analyze_images(self):
         """Performs analysis on image series and displays results"""
-        self.analyzer = ImageAnalyzer(self.image_series, self.folder_name)
+        self.analyzer = ImageAnalyzer(self.dataset_series, self.folder_name)
         self.dataframe = self.analyzer.compute_counts()
         fig = self.analyzer.generate_plot()
         self.canvas = FigureCanvasTkAgg(fig, self.root)
