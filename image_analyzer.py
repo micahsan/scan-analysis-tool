@@ -15,15 +15,23 @@ class ImageAnalyzer:
         self.df = self.compute_counts()
 
         # testing
-        # print(f"pixel_array type: {type(dataset_series[0].pixel_array[0,0])}")
-        # np.savetxt("pixel_array.txt", dataset_series[0].pixel_array,
-        #            fmt="%.1f")
-
-        # print(f"image type: {type(self.images[0][0,0])}")
-        # np.savetxt("image.txt", self.images[0], fmt="%.6f")
-
+        #
+        np.savetxt("image_segmented.txt", self.segment_object(self.images[
+                                                            100]), fmt="%.0f")
+        #
+        # np.savetxt("image_raw.txt", dataset_series[100].pixel_array,
+        #            fmt="%.2f")
+        # np.savetxt("image_rescaled.txt", self.images[100], fmt="%.2f")
+        #
+        # print(f"slope: {dataset_series[100].RescaleSlope}, intercept: {
+        # dataset_series[100].RescaleIntercept}")
+        #
         # plt.imshow(dataset_series[100].pixel_array, cmap=plt.cm.gray)
-        # plt.imshow(self.images[300], cmap=plt.cm.gray)
+        # plt.imshow(self.images[100], cmap=plt.cm.gray)
+        #
+        # plt.imshow(self.segment_object(dataset_series[100].pixel_array),
+        #            cmap=plt.cm.gray)
+        # plt.imshow(self.segment_object(self.images[300]), cmap=plt.cm.gray)
         #
         # plt.show()
 
@@ -49,7 +57,7 @@ class ImageAnalyzer:
 
     @staticmethod
     def segment_object(image):
-        """Uses Otsu's method of thresholding to segment image"""
-        th_val, th_img = cv.threshold(image, 0, 255,
-                                      cv.THRESH_BINARY + cv.THRESH_OTSU)
-        return th_img
+        """Uses binary thresholding to segment image"""
+        th_val, th_img = cv.threshold(image, 5000, 255,
+                                      cv.THRESH_BINARY)
+        return th_img > 0
